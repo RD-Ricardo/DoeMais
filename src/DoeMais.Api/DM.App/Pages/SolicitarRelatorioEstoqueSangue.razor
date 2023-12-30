@@ -1,0 +1,26 @@
+﻿<ModalHeader>
+    <ModalTitle>Solicitar relatório</ModalTitle>
+</ModalHeader>
+<ModalBody>
+         <Field ColumnSize="ColumnSize.Is12.OnDesktop">
+         <FieldLabel>Digite seu email para envio do relatório.</FieldLabel>
+            <FieldBody>
+                <TextEdit @bind-Text="@EmailDestinatario"></TextEdit>
+            </FieldBody>
+         </Field>
+</ModalBody>
+
+<ModalFooter Flex="Flex.JustifyContent.End">
+    <Button Color="Color.Success" Clicked="SolicitarRelatorio">Enviar</Button>
+</ModalFooter>
+
+@code {
+    [Parameter] public Func<bool, Task> OnSuccess { get; set; }
+
+    string EmailDestinatario = string.Empty;
+
+    public Task SolicitarRelatorio()
+    {
+        return Task.CompletedTask;
+    }
+}

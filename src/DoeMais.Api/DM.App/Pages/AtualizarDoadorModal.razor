@@ -1,0 +1,221 @@
+﻿@using DM.App.Models
+@using DM.Shared.InputModels
+@using DM.Shared.ViewModels
+@using System.Text.Json
+@using System.Text
+@using MediatR
+@inject IModalService ModalService;
+@inject INotificationService NotificationService;
+@inject HttpClient Http;
+
+<ModalHeader>
+    <ModalTitle>Atualizar doador</ModalTitle>
+</ModalHeader>
+
+@if (model != null)
+{
+    <ModalBody>
+        <EditForm Model="@model" OnValidSubmit="@SubmitModal">
+            <Validations @ref="validations" Mode="ValidationMode.Manual">
+                <Fields>
+                    <Field ColumnSize="ColumnSize.Is6.OnDesktop">
+                        <FieldLabel   
+                    RequiredIndicator
+                         >Nome completo</FieldLabel>
+                         <FieldBody>
+                             <Validation Validator="@ValidationRule.IsNotEmpty">
+                                 <TextEdit @bind-Text="model.NomeCompleto">
+                                     <Feedback>
+                                         <ValidationError>Nome obrigatório</ValidationError>
+                                     </Feedback>
+                                 </TextEdit>
+                             </Validation>
+                         </FieldBody>
+                     </Field>
+
+                     <Field ColumnSize="ColumnSize.Is6.OnDesktop">
+                         <FieldLabel 
+                    RequiredIndicator
+                         >Email</FieldLabel>
+                         <FieldBody>
+                             <Validation Validator="@ValidationRule.IsEmail">
+                                 <TextEdit @bind-Text="model.Email">
+                                     <Feedback>
+                                         <ValidationError>E-mail invalido</ValidationError>
+                                     </Feedback>
+                                 </TextEdit>
+                             </Validation>
+                         </FieldBody>
+                     </Field>
+
+                     <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                         <FieldLabel  
+                    RequiredIndicator
+                         >Peso</FieldLabel>
+                         <FieldBody>
+                             <NumericPicker TValue="double" @bind-Value="model.Peso" Placeholder="$1999" />
+                         </FieldBody>
+                     </Field>
+
+                     <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                         <FieldLabel  
+                    RequiredIndicator
+                         >Tipo sanguineo</FieldLabel>
+                     <Select Disabled @bind-SelectedValue="@tipoSanguineo">
+                             <SelectItem Value="1">Tipo A</SelectItem>
+                             <SelectItem Value="2">Tipo B</SelectItem>
+                             <SelectItem Value="3">Tipo O</SelectItem>
+                             <SelectItem Value="4">Tipo AB</SelectItem>
+                         </Select>
+                     </Field>
+
+                     <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                         <FieldLabel   
+                    RequiredIndicator
+                         >Fator RH</FieldLabel>
+                         <Select Disabled @bind-SelectedValue="@fatorRh">
+                             <SelectItem Value="1">Positivo</SelectItem>
+                             <SelectItem Value="2">Negativo</SelectItem>
+                         </Select>
+                     </Field>
+
+                     <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                         <FieldLabel   
+                    RequiredIndicator
+                         >Genero</FieldLabel>
+                         <Select  @bind-SelectedValue="@genero">
+                             <SelectItem Value="1">Masculino</SelectItem>
+                             <SelectItem Value="2">Feminino</SelectItem>
+                         </Select>
+                     </Field>
+
+                     <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                         <FieldLabel 
+                    RequiredIndicator
+                         >Data nascimento</FieldLabel>
+                     <DateEdit TValue="DateTime" @bind-Date="@model.DataNascimento" />
+                     </Field>
+
+
+                 <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                     <FieldLabel RequiredIndicator>Cep</FieldLabel>
+                     <FieldBody>
+                         <Validation>
+                             <TextEdit @bind-Text="@enderecoDTO.Cep" Disabled>
+                             </TextEdit>
+                         </Validation>
+                     </FieldBody>
+                 </Field>
+
+                 <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                     <FieldLabel RequiredIndicator>Cidade</FieldLabel>
+                     <TextEdit @bind-Text="@enderecoDTO.Cidade" Disabled>
+                     </TextEdit>
+                 </Field>
+
+                 <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                     <FieldLabel RequiredIndicator>Logradouro</FieldLabel>
+                     <TextEdit @bind-Text="@enderecoDTO.Logradouro" Disabled>
+                     </TextEdit>
+                 </Field>
+
+                 <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                     <FieldLabel RequiredIndicator>Cep</FieldLabel>
+                     <TextEdit @bind-Text="@enderecoDTO.Estado" Disabled>
+                     </TextEdit>
+                 </Field>
+                </Fields>
+             </Validations>
+             <Div Flex="Flex.JustifyContent.End">
+                 <Button Type="ButtonType.Submit" Color="Color.Success">Salvar</Button>
+             </Div>
+         </EditForm>
+     </ModalBody>
+}
+else
+{
+    <Span>Carregando...</Span>
+}
+
+@code {
+    [Parameter] 
+    public Func<bool, Task> OnSuccess { get; set; }
+
+    [Parameter] 
+    public string DoadorId { get; set; }
+
+    public DoadorPorIdViewModel model = new ();
+    public EnderecoDTO enderecoDTO = new();
+    public DateTime dataNascimento;
+    public Validations validations;
+
+    public int tipoSanguineo { get; set; }
+    public int fatorRh { get; set; }
+    public int genero { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BuscarDodoar();
+    }
+
+    private async Task BuscarDodoar()
+    {
+        var requeste = await Http.GetAsync($"api/Doador/{DoadorId}");
+
+        var response = await requeste.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<RequestResult<DoadorPorIdViewModel>>(response,
+            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+        model = result.Dados;
+
+        tipoSanguineo = (int)model.TipoSanguineo;
+        fatorRh = (int)model.FatorRh;
+        genero = (int)model.Genero;
+        enderecoDTO = new EnderecoDTO
+        {
+            Cep = model.Endereco.Cep,
+            Logradouro = model.Endereco.Logradouro,
+            Cidade = model.Endereco.Cidade,
+            Estado = model.Endereco.Estado
+        };
+
+        StateHasChanged();
+    }
+
+    public async Task SubmitModal()
+    {
+        DoadorInputModel doador = new()
+        {
+            Cep = enderecoDTO.Cep,
+            DataNascimento = dataNascimento,
+            Email = model.Email,
+            FatorRh = fatorRh,
+            Genero = genero,
+            NomeCompleto = model.NomeCompleto,
+            Peso = model.Peso,
+            TipoSanguineo = tipoSanguineo
+        };
+
+        var request = await Http.PutAsJsonAsync($"api/Doador/{DoadorId}", doador);
+
+        if (!request.IsSuccessStatusCode)
+        {
+            var response = await request.Content.ReadAsStreamAsync();
+
+            var result = JsonSerializer.Deserialize<RequestResult<Unit>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (var erro in result.MensagensErros)
+            {
+                stringBuilder = stringBuilder.Append(erro);
+            }
+
+            await NotificationService.Error(stringBuilder.ToString(), "Error!");
+        }
+        
+        await OnSuccess(request.IsSuccessStatusCode);
+        await ModalService.Hide();
+    }
+}

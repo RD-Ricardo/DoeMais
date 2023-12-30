@@ -1,0 +1,126 @@
+﻿@page "/";
+@page "/doador";
+@inject HttpClient Http;
+@inject IModalService ModalService;
+@using System.Text.Json;
+@using DM.Shared.ViewModels;
+
+<Container Fluid Style="height: 97vh;">
+   <LoadingIndicator @bind-Visible="@exibirDados" Style="height: 90%;">
+   <Heading Size="HeadingSize.Is2">Doadores</Heading>
+    @if (doadorViewModels != null)
+    {
+        <Row Style="height: 100%; width: 100%; overflow-y: auto;">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHeaderCell>Nome</TableHeaderCell>
+                        <TableHeaderCell>Email</TableHeaderCell>
+                        <TableHeaderCell>Tipo sanguineo</TableHeaderCell>
+                        <TableHeaderCell>Fator RH</TableHeaderCell>
+                        <TableHeaderCell>Data nascimento</TableHeaderCell>
+                        <TableHeaderCell></TableHeaderCell>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    @foreach (var item in doadorViewModels)
+                    {
+
+                        <TableRow @key="@item" Style="height:50px; max-height:50px; ">
+                            <TableRowCell>@item.NomeCompleto</TableRowCell>
+                                <TableRowCell>@item.Email</TableRowCell>
+                                <TableRowCell>@item.TipoSanguineo</TableRowCell>
+                                <TableRowCell>@item.FatorRh</TableRowCell>
+                                <TableRowCell>@item.DataNascimento.Date</TableRowCell>
+                                <TableRowCell>
+                                    <Button Color="Color.Primary" @onclick=@(e => AtualizarDoador(e, item.Id))><span class="oi oi-pencil"></span></Button>
+                                </TableRowCell>
+                            </TableRow>
+                    }
+                </TableBody>
+            </Table>
+        </Row>
+    }
+    </LoadingIndicator>
+    <Row Style="height:10%;">
+        <Column Flex="Flex.JustifyContent.End.AlignItems.End"  ColumnSize="ColumnSize.Is12">
+            <Div Style="width: 200px;">
+                <Button Color="Color.Danger" Clicked="CadastrarDoador" Block>Novo doador</Button>
+            </Div>
+        </Column>
+    </Row>
+</Container>
+
+
+
+@code {
+    public bool exibirDados = false;
+    
+    private  List<DoadorViewModel> doadorViewModels;
+
+    private DoadorViewModel doadorViewModel;
+
+    private bool usuarioAdicionado = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ListaDoadores();
+    }
+
+    private async Task ListaDoadores()
+    {
+        exibirDados = true;
+        var requeste = await Http.GetAsync("api/Doador");
+
+        var response = await requeste.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<RequestResult<List<DoadorViewModel>>>(response, 
+            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+        doadorViewModels = result.Dados;
+        exibirDados = false;
+        StateHasChanged();
+    }
+
+
+    public Task CadastrarDoador()
+    {
+        return ModalService.Show<CadastrarDoadorModal>(x =>
+        {
+            x.Add(x => x.OnSuccess, ValidarFormuario);
+        },
+        new ModalInstanceOptions()
+        {
+           UseModalStructure = false,
+           Centered = true,
+           Size = ModalSize.Large
+        });
+    }
+
+    public Task AtualizarDoador(MouseEventArgs e, string doadorId)
+    {
+        return ModalService.Show<AtualizarDoadorModal>(x =>
+        {
+            x.Add(x => x.OnSuccess, ValidarFormuario);
+            x.Add(x => x.DoadorId, doadorId);
+        },
+        new ModalInstanceOptions()
+        {
+           UseModalStructure = false,
+           Centered = true,
+           Size = ModalSize.Large,
+        });
+    }
+
+    private async Task ValidarFormuario(bool sucesso)
+    {
+        if (sucesso)
+        {
+            await ListaDoadores();
+            StateHasChanged();
+        }
+
+        await Task.CompletedTask; 
+    }
+
+}

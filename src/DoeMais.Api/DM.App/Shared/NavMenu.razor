@@ -1,0 +1,36 @@
+﻿
+<div class="container-fluid">
+    <Heading Size="HeadingSize.Is2" TextColor="TextColor.White" TextAlignment="TextAlignment.Center" Style="padding-top: 10px;">Doe mais</Heading>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <i class="fa-solid fa-fire-flame-simple"></i>
+                <span class="oi oi-people" aria-hidden="true"></span> Doador
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="doacao">
+                <span class="oi oi-medical-cross"></span> Doação
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="estoque-sangue">
+                <span class="oi oi-droplet"></span> Estoque de sangue
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

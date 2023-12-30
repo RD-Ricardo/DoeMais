@@ -1,0 +1,95 @@
+﻿@using DM.Shared.InputModels;
+@using DM.Shared.ViewModels;
+@using System.Text.Json;
+@using System.Text;
+@inject HttpClient Http;
+@inject IModalService ModalService;
+@inject INotificationService NotificationService;
+
+<ModalHeader>
+    <ModalTitle>Novo doação de sangue</ModalTitle>
+</ModalHeader>
+<ModalBody>
+    <EditForm Model="@model" OnValidSubmit="@SubmitModal">
+        <Fields>
+            <Field ColumnSize="ColumnSize.Is6.OnDesktop">
+                <FieldLabel>Doador</FieldLabel>
+                <FieldBody>
+                    <SelectList TItem="DoadorViewModel"
+                        TValue="string"
+                        Data="@doadorViewModels"
+                        TextField="@((item)=>item.NomeCompleto)"
+                        ValueField="@((item)=>item.Id)"
+                                @bind-SelectedValue="@selectedValueDoadorId"
+                        DefaultItemText="Selecione o doador" />
+                </FieldBody>
+            </Field>
+            <Field ColumnSize="ColumnSize.Is6.OnDesktop">
+                <FieldLabel>Quantiade ML</FieldLabel>
+                <FieldBody>
+                    <NumericPicker @bind-Value="model.QuantidadeML"></NumericPicker>
+                </FieldBody>
+            </Field>
+        </Fields>
+        <Div Flex="Flex.JustifyContent.End">
+            <Button Type="ButtonType.Submit" Color="Color.Success">Salvar</Button>
+        </Div>
+    </EditForm>
+</ModalBody>
+
+
+
+@code {
+    [Parameter] 
+    public Func<bool, Task> OnSuccess { get; set; }
+    public string selectedValueDoadorId;
+
+    private List<DoadorViewModel> doadorViewModels;
+    private DoacaoInputModel model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ListaDoadores();
+    }
+
+    private async Task ListaDoadores()
+    {
+        var requeste = await Http.GetAsync("api/Doador");
+
+        var response = await requeste.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<RequestResult<List<DoadorViewModel>>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+        doadorViewModels = result.Dados;
+        StateHasChanged();
+    }
+
+    private async Task SubmitModal()
+    {
+        model.DoadorId = selectedValueDoadorId;
+
+        var json = JsonSerializer.Serialize(model);
+
+        var request = await Http.PostAsJsonAsync("api/Doacao", model);
+
+        if(!request.IsSuccessStatusCode)
+        {
+            var response = await request.Content.ReadAsStreamAsync();
+
+            var result = JsonSerializer.Deserialize<RequestResult<bool>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (var erro in result.MensagensErros)
+            {
+                stringBuilder = stringBuilder.Append(erro);
+            }
+            
+            await NotificationService.Error(stringBuilder.ToString(), "Error!");
+        }
+
+        await OnSuccess(request.IsSuccessStatusCode);
+        await ModalService.Hide();
+    }
+
+}

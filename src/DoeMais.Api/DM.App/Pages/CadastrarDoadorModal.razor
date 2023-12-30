@@ -1,0 +1,164 @@
+﻿@using DM.Shared.Enums
+@using DM.Shared.InputModels;
+@using System.Text.Json;
+@using System.Text
+@inject IModalService ModalService;
+@inject INotificationService NotificationService;
+@inject HttpClient Http;
+
+<ModalHeader>
+    <ModalTitle>Novo doador</ModalTitle>
+</ModalHeader>
+<ModalBody>
+    <EditForm Model="@model" OnValidSubmit="@SubmitModal">
+        <Validations @ref="validations" Mode="ValidationMode.Manual">
+        <Fields>
+            <Field ColumnSize="ColumnSize.Is6.OnDesktop">
+                <FieldLabel RequiredIndicator>Nome completo</FieldLabel>
+                <FieldBody>
+                    <Validation Validator="@ValidationRule.IsNotEmpty">
+                        <TextEdit @bind-Text="model.NomeCompleto">
+                            <Feedback>
+                                 <ValidationError>Nome obrigatório</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Validation>
+                </FieldBody>
+            </Field>
+        
+            <Field ColumnSize="ColumnSize.Is6.OnDesktop">
+                <FieldLabel RequiredIndicator>Email</FieldLabel>
+                <FieldBody>
+                    <Validation Validator="@ValidationRule.IsEmail">
+                        <TextEdit @bind-Text="model.Email">
+                            <Feedback>
+                                <ValidationError>E-mail invalido</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Validation>
+                </FieldBody>
+            </Field>
+       
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                        <FieldLabel RequiredIndicator>Peso</FieldLabel>
+                <FieldBody>
+                    <NumericPicker TValue="double" @bind-Value="model.Peso" Placeholder="$1999" />
+                </FieldBody>
+            </Field>
+
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                        <FieldLabel RequiredIndicator>Tipo sanguineo</FieldLabel>
+                    <Select TValue="int" @bind-SelectedValue="@selectTipoSanguineo">
+                    <SelectItem Value="1">Tipo A</SelectItem>
+                    <SelectItem Value="2">Tipo B</SelectItem>
+                    <SelectItem Value="3">Tipo O</SelectItem>
+                    <SelectItem Value="4">Tipo AB</SelectItem>
+                </Select>
+             </Field>
+
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                        <FieldLabel RequiredIndicator>Fator RH</FieldLabel>
+                    <Select TValue="int" @bind-SelectedValue="@selectFatorRh">
+                    <SelectItem Value="1">Positivo</SelectItem>
+                    <SelectItem Value="2">Negativo</SelectItem>
+                </Select>
+            </Field>
+
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                    <FieldLabel RequiredIndicator>Genero</FieldLabel>
+                    <Select TValue="int" @bind-SelectedValue="@selectGenero">
+                    <SelectItem Value="1">Masculino</SelectItem>
+                    <SelectItem Value="2">Feminino</SelectItem>
+                </Select>
+            </Field>
+
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                        <FieldLabel RequiredIndicator>Data nascimento</FieldLabel>
+                <DateEdit TValue="DateTime?" @bind-Date="@dataNascimento" />
+            </Field>
+
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop">
+                <FieldLabel RequiredIndicator>
+                    Cep
+                </FieldLabel>
+                <FieldBody>
+                    <Validation UsePattern>
+                        <TextEdit Pattern="[0-9]{5}[0-9]{3}" @bind-Text="model.Cep">
+                            <Feedback>
+                                <ValidationError>Cep invalido</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Validation>
+                </FieldBody>
+            </Field>
+        </Fields>
+        </Validations>
+        <Div Flex="Flex.JustifyContent.End">
+        <Button Type="ButtonType.Submit" Color="Color.Success">Salvar</Button>
+    </Div>
+    </EditForm>
+</ModalBody>
+
+
+
+@code {
+    [Parameter] public Func<bool, Task> OnSuccess { get; set; }
+    private DoadorInputModel  model = new();
+
+    public int selectGenero = 1;
+    public int selectFatorRh = 1;
+    public int selectTipoSanguineo = 1;
+
+    public DateTime? dataNascimento;
+    public Validations validations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    public async Task SubmitModal()
+    {
+        if (await validations.ValidateAll())
+        {
+            model.TipoSanguineo = selectTipoSanguineo;
+            model.FatorRh = selectFatorRh;
+            model.Genero = selectGenero;
+
+            model.DataNascimento = dataNascimento.GetValueOrDefault();
+            var request = await Http.PostAsJsonAsync("api/Doador", model);
+
+            var response = await request.Content.ReadAsStreamAsync();
+
+            var result = JsonSerializer.Deserialize<RequestResult<bool>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            if (!request.IsSuccessStatusCode)
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                foreach (var erro in result.MensagensErros)
+                {
+                    stringBuilder = stringBuilder.Append(erro);
+                }
+
+                await NotificationService.Error(stringBuilder.ToString(), "Ops");
+            }
+            else
+            {
+                await NotificationService.Success("Doador cadastrado", "Sucesso");
+            }
+
+            await OnSuccess(request.IsSuccessStatusCode);
+            await ModalService.Hide();
+        }
+    }
+
+    void ValidateEmail(ValidatorEventArgs e)
+    {
+        var email = Convert.ToString(e.Value);
+
+        e.Status = string.IsNullOrEmpty(email) ? ValidationStatus.None :
+            email.Contains("@") ? ValidationStatus.Success : ValidationStatus.Error;
+    }
+
+}

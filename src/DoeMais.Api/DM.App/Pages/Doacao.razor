@@ -1,0 +1,94 @@
+﻿@page "/doacao";
+@inject HttpClient Http;
+@inject IModalService ModalService;
+@using System.Text.Json;
+@using DM.Shared.ViewModels;
+
+<Container Fluid>
+    <Row Style="height: 93vh;">
+    <LoadingIndicator @bind-Visible="@exibirDados" Style="height: 90%; width:100%;">
+     @if (@doacoesViewModel != null)
+        {
+            <Column ColumnSize="ColumnSize.Is12" Style="width:100%; ">
+                <Heading Size="HeadingSize.Is2">Doações</Heading>
+                <DataGrid TItem="DoacaoViewModel"
+                          Data="@doacoesViewModel"
+                          @bind-SelectedRow="@doacaoViewModel"
+                        Editable
+                        Responsive>
+                 <DataGridColumn Field="@nameof(DoacaoViewModel.DataDoacao)" Caption="Data doação" Editable />
+                     <DataGridColumn Field="@nameof(DoacaoViewModel.DaoadorNome)" Caption="Nome doador" Editable />
+                     <DataGridColumn Field="@nameof(DoacaoViewModel.QuantidadeML)" Caption="Quantiade ML" Editable />
+                </DataGrid>
+             </Column>
+        }
+     </LoadingIndicator>
+    </Row>
+    <Row>
+        <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is12">
+            <Div Style="width: 200px;">
+                <Button Color="Color.Danger"  Clicked="CadastrarDoador" Block>Nova doação</Button>
+            </Div>
+        </Column>
+    </Row>
+</Container>
+
+
+
+@code {
+    public bool exibirDados = false;
+    
+    private List<DoacaoViewModel> doacoesViewModel;
+    
+    private DoacaoViewModel doacaoViewModel;
+
+    private bool shouldRender;
+
+    protected override bool ShouldRender() => shouldRender;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ListaDoacoes();
+        shouldRender = true;
+    }
+
+    private async Task ListaDoacoes()
+    {
+        exibirDados = true;
+        var request = await Http.GetAsync("api/Doacao");
+
+        var response = await request.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<RequestResult<List<DoacaoViewModel>>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+        doacoesViewModel = result.Dados;
+        exibirDados = false;
+        StateHasChanged();
+    }
+
+
+    public Task CadastrarDoador()
+    {
+        return ModalService.Show<CadastrarDoacaoModal>(x =>
+        {
+            x.Add(x => x.OnSuccess, ValidarFormuario);
+        },
+        new ModalInstanceOptions
+        {
+            UseModalStructure = false,
+            Centered = true,
+            Size = ModalSize.Large
+        });
+    }
+
+    private async Task ValidarFormuario(bool sucesso)
+    {
+        if (sucesso)
+        {
+            await ListaDoacoes();
+            StateHasChanged();
+        }
+
+        await Task.CompletedTask;
+    }
+}

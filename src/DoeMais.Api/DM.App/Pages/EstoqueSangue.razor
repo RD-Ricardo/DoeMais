@@ -1,0 +1,257 @@
+﻿@page "/estoque-sangue";
+
+@using System.Text.Json;
+@using DM.Shared.ViewModels;
+@using Newtonsoft.Json;
+@inject IModalService ModalService;
+@inject HttpClient Http;
+
+
+<Container Fluid Style="height: 93vh;">
+    <h3>Estoque de sangue</h3>
+    <hr>
+    <LoadingIndicator @bind-Visible="@exibirDados" Style="height: 100%;">
+        @if (estoqueSangue != null)
+        {
+            <Row>
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Card Style="background-color: #dd4343d5; border: 1px solid #dd4343" 
+                WhiteText
+                     >
+                         <CardBody>
+                             <CardTitle Size="3">
+                                 <Row>
+                                     <Column ColumnSize="ColumnSize.Is6">
+                                         A +
+                                     </Column>
+                                     <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is6">
+                                     <span>@estoqueSangue.APositivo.QuantidadeDoadores</span>&nbsp<span style="padding-top: 1px" class="oi oi-person"></span>
+                                    </Column>
+                                </Row>
+                            </CardTitle>
+                            <CardText TextWeight="TextWeight.Bold">
+                                @estoqueSangue.APositivo.QuantidadeML ML
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Column>
+
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Card Style="background-color: #dd4343d5; border: 1px solid #dd4343"     
+                WhiteText
+                     >
+                         <CardBody>
+                             <CardTitle Size="3">
+                                 <Row>
+                                     <Column ColumnSize="ColumnSize.Is6">
+                                         A -
+                                     </Column>
+                                     <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is6">
+                                         <span>@estoqueSangue.ANegativo.QuantidadeDoadores</span>&nbsp<span style="padding-top: 1px" class="oi oi-person"></span>
+                                    </Column>
+                                </Row>
+                            </CardTitle>
+                            <CardText TextWeight="TextWeight.Bold">
+                                <span>@estoqueSangue.ANegativo.QuantidadeML</span>&nbsp ML
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Column>
+
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Card Style="background-color: #dd4343d5; border: 1px solid #dd4343;"  
+                WhiteText
+                     >
+                         <CardBody>
+                             <CardTitle Size="3">
+                                 <Row>
+                                     <Column ColumnSize="ColumnSize.Is6">
+                                         B +
+                                     </Column>
+                                     <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is6">
+                                         <span>@estoqueSangue.BPositivo.QuantidadeDoadores</span>&nbsp<span style="padding-top: 1px" class="oi oi-person"></span>
+                                    </Column>
+                                </Row>
+                            </CardTitle>
+                            <CardText TextWeight="TextWeight.Bold">
+                                <span>@estoqueSangue.BPositivo.QuantidadeML</span>&nbsp ML
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Column>
+
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Card Style="background-color: #dd4343d5; border: 1px solid #dd4343;"     
+                WhiteText
+                     >
+                         <CardBody>
+                             <CardTitle Size="3">
+                                 <Row>
+                                     <Column ColumnSize="ColumnSize.Is6">
+                                         B -
+                                     </Column>
+                                     <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is6">
+                                         <span>@estoqueSangue.BNegativo.QuantidadeDoadores</span>&nbsp<span style="padding-top: 1px" class="oi oi-person"></span>
+                                    </Column>
+                                </Row>
+                            </CardTitle>
+                            <CardText TextWeight="TextWeight.Bold">
+                                <span>@estoqueSangue.BNegativo.QuantidadeML</span>&nbsp ML
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Column>
+            </Row>
+
+            <Row Style="margin-top: 30px;">
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Card Style="background-color: #dd4343d5; border: 1px solid #dd4343" 
+                WhiteText
+                     >
+                         <CardBody>
+                             <CardTitle Size="3">
+                                 <Row>
+                                     <Column ColumnSize="ColumnSize.Is6">
+                                         AB +
+                                     </Column>
+                                     <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is6">
+                                         <span>@estoqueSangue.ABPositivo.QuantidadeDoadores</span>&nbsp<span style="padding-top: 1px" class="oi oi-person"></span>
+                                    </Column>
+                                </Row>
+                            </CardTitle>
+                            <CardText TextWeight="TextWeight.Bold">
+                                <span>@estoqueSangue.ABPositivo.QuantidadeML</span>&nbsp ML
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Column>
+
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Card Style="background-color: #dd4343d5; border: 1px solid #dd4343"   
+                WhiteText
+                     >
+                         <CardBody>
+                             <CardTitle Size="3">
+                                 <Row>
+                                     <Column ColumnSize="ColumnSize.Is6">
+                                         AB -
+                                     </Column>
+                                     <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is6">
+                                         <span>@estoqueSangue.ABNegativo.QuantidadeDoadores</span>&nbsp<span style="padding-top: 1px" class="oi oi-person"></span>
+                                    </Column>
+                                </Row>
+                            </CardTitle>
+                            <CardText TextWeight="TextWeight.Bold">
+                                <span>@estoqueSangue.ABNegativo.QuantidadeDoadores</span>&nbspML
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Column>
+
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Card Style="background-color: #dd4343d5; border: 1px solid #dd4343;"  
+                WhiteText
+                     >
+                         <CardBody>
+                             <CardTitle Size="3">
+                                 <Row>
+                                     <Column ColumnSize="ColumnSize.Is6">
+                                         O +
+                                     </Column>
+                                     <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is6">
+                                         <span>@estoqueSangue.OPositivo.QuantidadeDoadores</span>&nbsp<span style="padding-top: 1px" class="oi oi-person"></span>
+                                    </Column>
+                                </Row>
+                            </CardTitle>
+                            <CardText TextWeight="TextWeight.Bold">
+                                <span>@estoqueSangue.OPositivo.QuantidadeML</span>&nbspML
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Column>
+
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Card Style="background-color: #dd4343d5; border: 1px solid #dd4343;"     
+                WhiteText
+                     >
+                         <CardBody>
+                             <CardTitle Size="3">
+                                 <Row>
+                                     <Column ColumnSize="ColumnSize.Is6">
+                                         O -
+                                     </Column>
+                                     <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is6">
+                                         <span>@estoqueSangue.ONegativo.QuantidadeDoadores</span>&nbsp<span style="padding-top: 1px" class="oi oi-person"></span>
+                                    </Column>
+                                </Row>
+                            </CardTitle>
+                            <CardText TextWeight="TextWeight.Bold">
+                                <span>@estoqueSangue.ONegativo.QuantidadeML</span>&nbspML
+                            </CardText>
+                        </CardBody>
+                    </Card>
+                </Column>
+            </Row>
+        }
+    </LoadingIndicator>
+</Container>
+
+<Container Fluid>
+    <Row>
+        <Column Flex="Flex.JustifyContent.End" ColumnSize="ColumnSize.Is12" >
+            <Button Color="Color.Danger" Clicked="SolicitarRelatorio">Solicitar relatorio</Button>
+        </Column>
+    </Row>
+</Container>
+@code {
+    public bool exibirDados = false;
+
+    EstoqueSangueViewModel estoqueSangue = null;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BuscarEstoqueSangue();
+    }
+
+    private async Task BuscarEstoqueSangue()
+    {
+        exibirDados = true;
+        var request = await Http.GetAsync("api/EstoqueSangue");
+
+        if (request.IsSuccessStatusCode)
+        {
+            var response = await request.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<RequestResult<EstoqueSangueViewModel>>(response, new Newtonsoft.Json.JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            });
+
+            estoqueSangue = result.Dados;
+        }
+
+        exibirDados = false;
+        StateHasChanged();
+    }
+
+    public Task SolicitarRelatorio()
+    {
+        return ModalService.Show<SolicitarRelatorioEstoqueSangue>(x =>
+        {
+            x.Add(x => x.OnSuccess, ResultadoFormulario);
+        },
+        new ModalInstanceOptions()
+        {
+                UseModalStructure = false,
+                Centered = true,
+                Size = ModalSize.Default
+        });
+    }
+
+    private Task ResultadoFormulario(bool teste)
+    {
+        return Task.CompletedTask;
+    }
+
+}
