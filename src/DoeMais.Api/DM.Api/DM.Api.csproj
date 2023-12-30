@@ -2,8 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DM.Application\DM.Application.csproj" />
+    <ProjectReference Include="..\DM.Core\DM.Core.csproj" />
+    <ProjectReference Include="..\DM.Infrastructure\DM.Infrastructure.Data.csproj" />
+  </ItemGroup>
 
 </Project>

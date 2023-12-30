@@ -18,10 +18,20 @@ namespace DM.Core.Communication.Mediator
             return _mediador.Send(command);
         }
 
+        public Task<RequestResult<TResult>> PublicarConsulta<TQuery, TResult>(TQuery query) where TQuery : Query<TResult>
+        {
+            return _mediador.Send(query);
+        }
+
+        public Task PublicarDomainEvent<TEvent>(TEvent evento) where TEvent : Event
+        {
+            return _mediador.Publish(evento);
+            
+        }
+
         public Task PublicarNotificacao<TNotification>(TNotification notification) where TNotification : DomainNotification
         {
-            _mediador.Publish(notification);
-            return Task.CompletedTask;
+            return _mediador.Publish(notification);
         }
     }
 }

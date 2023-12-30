@@ -1,25 +1,46 @@
+using DM.Core.Communication.Mediator;
+using DM.Infrastructure.Data;
+using DM.Infrastructure.Data.CommandsDb;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddControllers();
+
+string connectionStringMySql = builder.Configuration["MySql:Connection"];
+
+builder.Services.AddDbContext<DoeMaisDbContextMySql>(x => x.UseMySql(connectionStringMySql, ServerVersion.AutoDetect(connectionStringMySql)));
+builder.Services.InfrastructureData();
+builder.Services.AddScoped<DoeMaisDbContextMySql>();
+builder.Services.AddScoped<IMediatorHandler, MediatorHandler>();
+
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssembly(AppDomain.CurrentDomain.Load("DM.Application"));
+});
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
+app.UseCors(x => {
+    x.AllowAnyOrigin();
+    x.AllowAnyHeader();
+    x.AllowAnyMethod();
+});
+
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 
-app.UseRouting();
+//app.UseAuthorization();
 
-app.UseAuthorization();
-
-app.MapRazorPages();
+app.MapControllers();
 
 app.Run();

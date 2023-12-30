@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DM.Core.DomainObjects.ValueObjects
+﻿namespace DM.Core.DomainObjects.ValueObjects
 {
-    internal class Email
+    public class Email
     {
+        public string  Value { get; private set; }
+        public Email(string value)
+        {
+            Value = value;
+        }
     }
 }

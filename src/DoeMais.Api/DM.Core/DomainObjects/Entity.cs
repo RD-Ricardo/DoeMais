@@ -1,22 +1,35 @@
 ﻿using DM.Core.Messages;
-using System.Reflection.PortableExecutable;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.Runtime.Serialization;
 
 namespace DM.Core.DomainObjects
 {
     public abstract class Entity
     {
-        public int Id { get; private set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.String)]
+        [DataMember]
+        public Guid Id { get; set; }
         
         public DateTime DataCadastro { get; private set; }
         
         public DateTime DataAtualizado { get; private set; }
 
+        protected Entity()
+        {
+            Id = Guid.NewGuid();
+        }
+
+        public void SetDataCadastro(DateTime dataCadastro)
+        {
+            DataCadastro = dataCadastro;
+        }
+        
         public void SetDataAtualizado(DateTime dataAtualizado)
         {
             DataAtualizado= dataAtualizado;
         }
-
-        public Entity() { }
 
         private List<Event> _eventos;
         

@@ -7,11 +7,11 @@ namespace DM.Core.Messages
     public abstract class Query<TResponse> : Message, IRequest<RequestResult<TResponse>>
     {
         public DateTime TimeStamp { get; private set; } = DateTime.Now;
-        public ValidationResult ValidationResultCommand { get; set; }
+        public ValidationResult ValidationResultQuery { get; set; }
         
         public Query()
         {
-            ValidationResultCommand = new ValidationResult();
+            ValidationResultQuery = new ValidationResult();
         }
 
         public abstract bool IsValid();

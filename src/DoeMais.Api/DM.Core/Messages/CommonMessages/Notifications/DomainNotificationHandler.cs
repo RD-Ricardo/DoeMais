@@ -17,14 +17,10 @@ namespace DM.Core.Messages.CommonMessages.Notifications
             return Task.CompletedTask;
         }
 
-        public virtual ObterNotificao()
-        {
+        public virtual List<DomainNotification>  ObterNotificao() 
+            => _notifications;
 
-        }
-
-        public virtual bool TemNotificao()
-        {
-            return _notifications.Any();
-        }
+        public virtual bool TemNotificao() 
+            => ObterNotificao().Any();
     }
 }

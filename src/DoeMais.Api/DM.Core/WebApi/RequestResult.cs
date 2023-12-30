@@ -4,12 +4,12 @@
     {
         public TDados? Dados { get; private set; }
         public bool Sucesso { get; private set; }
-        public string? MensagemErro { get; private set; }
-        public RequestResult(bool sucesso, TDados? dados, string? mensagemErro)
+        public List<string>? MensagensErros { get; private set; }
+        public RequestResult(bool sucesso, List<string> mensagemErro = null, TDados dados = default)
         {
             Dados = dados;
             Sucesso = sucesso;
-            MensagemErro = mensagemErro;
+            MensagensErros = mensagemErro;
         }
     }
 

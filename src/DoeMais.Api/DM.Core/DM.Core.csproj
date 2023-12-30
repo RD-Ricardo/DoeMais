@@ -15,18 +15,33 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.8.1" />
     <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MongoDB.Driver" Version="2.23.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="MessagesExceptions\DMMessages.Designer.cs">
+    <Compile Update="MessagesExceptions\MessagesExceptions.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>DMMessages.resx</DependentUpon>
+      <DependentUpon>MessagesExceptions.resx</DependentUpon>
+    </Compile>
+    <Compile Update="MessagesExceptions\DMMessagesusing DM.Domain.Entities;.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DMMessagesusing DM.Domain.Entities%3b.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="MessagesExceptions\DMMessages.resx">
+    <EmbeddedResource Update="MessagesExceptions\MessagesExceptions.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>MessagesExceptions.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="MessagesExceptions\DMMessagesusing DM.Domain.Entities;.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>DMMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>

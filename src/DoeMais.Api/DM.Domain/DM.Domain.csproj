@@ -3,13 +3,16 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\" />
-    <Folder Include="Events\" />
-    <Folder Include="RepositoriesInterfaces\" />
+    <Compile Remove="Events\**" />
+    <Compile Remove="RepositoriesInterfaces\**" />
+    <EmbeddedResource Remove="Events\**" />
+    <EmbeddedResource Remove="RepositoriesInterfaces\**" />
+    <None Remove="Events\**" />
+    <None Remove="RepositoriesInterfaces\**" />
   </ItemGroup>
 
   <ItemGroup>

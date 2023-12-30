@@ -3,13 +3,17 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\" />
-    <Folder Include="Events\" />
-    <Folder Include="Queries\" />
+    <PackageReference Include="Quartz" Version="3.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DM.Core\DM.Core.csproj" />
+    <ProjectReference Include="..\DM.Domain\DM.Domain.csproj" />
+    <ProjectReference Include="..\DM.Shared\DM.Shared.csproj" />
   </ItemGroup>
 
 </Project>
