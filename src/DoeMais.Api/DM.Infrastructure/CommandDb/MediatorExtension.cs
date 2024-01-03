@@ -11,13 +11,10 @@ namespace DM.Infrastructure.Data.CommandsDb
 
             var domainEvents = domainEntities.SelectMany(x => x.Entity.Eventos).ToList();
 
-            domainEntities.ToList().ForEach(entity => entity.Entity.LimparEventos());
-
             var tasks = domainEvents.Select(async (domian) =>
             {
                 await mediator.PublicarDomainEvent(domian);
             });
-
 
             await Task.WhenAll(tasks);
         }

@@ -31,9 +31,10 @@
                                 <TableRowCell>@item.Email</TableRowCell>
                                 <TableRowCell>@item.TipoSanguineo</TableRowCell>
                                 <TableRowCell>@item.FatorRh</TableRowCell>
-                                <TableRowCell>@item.DataNascimento.Date</TableRowCell>
+                                <TableRowCell>@item.DataNascimento.Date.ToString("dd-MM-yyyy")</TableRowCell>
                                 <TableRowCell>
-                                    <Button Color="Color.Primary" @onclick=@(e => AtualizarDoador(e, item.Id))><span class="oi oi-pencil"></span></Button>
+                                    <Button Color="Color.Primary" Outline @onclick=@(e => AtualizarDoador(e, item.Id))><span class="oi oi-pencil"></span></Button>
+                                    <Button Color="Color.Warning" Outline @onclick=@(e => VizualizarDoacoes(e, item.Id))><span class="oi oi-eye"></span></Button>
                                 </TableRowCell>
                             </TableRow>
                     }
@@ -108,8 +109,22 @@
         {
            UseModalStructure = false,
            Centered = true,
-           Size = ModalSize.Large,
+           Size = ModalSize.Small,
         });
+    }
+
+    public Task VizualizarDoacoes(MouseEventArgs e, string doadorId)
+    {
+        return ModalService.Show<VizualizarDoacoesDoadorModal>(x =>
+        {
+            x.Add(x => x.DoadorId, doadorId);
+        },
+        new ModalInstanceOptions()
+            {
+                UseModalStructure = false,
+                Centered = true,
+                Size = ModalSize.Large,
+            });
     }
 
     private async Task ValidarFormuario(bool sucesso)

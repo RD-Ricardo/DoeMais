@@ -1,11 +1,15 @@
-﻿<ModalHeader>
+﻿@inject IModalService ModalService;
+@inject INotificationService NotificationService;
+@inject HttpClient Http;
+
+<ModalHeader>
     <ModalTitle>Solicitar relatório</ModalTitle>
 </ModalHeader>
 <ModalBody>
          <Field ColumnSize="ColumnSize.Is12.OnDesktop">
          <FieldLabel>Digite seu email para envio do relatório.</FieldLabel>
             <FieldBody>
-                <TextEdit @bind-Text="@EmailDestinatario"></TextEdit>
+            <TextEdit Role="TextRole.Email" @bind-Text="@emailDestinatario"></TextEdit>
             </FieldBody>
          </Field>
 </ModalBody>
@@ -17,10 +21,27 @@
 @code {
     [Parameter] public Func<bool, Task> OnSuccess { get; set; }
 
-    string EmailDestinatario = string.Empty;
+    string emailDestinatario = string.Empty;
 
-    public Task SolicitarRelatorio()
+    public async Task SolicitarRelatorio()
     {
-        return Task.CompletedTask;
+        if (string.IsNullOrEmpty(emailDestinatario) || !emailDestinatario.Contains("@"))
+        {
+            await NotificationService.Error("Email invalido", "Erro");
+            return;
+        }
+
+        var request = await Http.PostAsync($"api/Relatorio/estoque-sangue?email={emailDestinatario}", null);
+
+        if (request.IsSuccessStatusCode)
+        {
+            await NotificationService.Success("Email enviado, verifique a caixa de spam.", "Sucesso");
+        }
+        else
+        {
+           await NotificationService.Error("Ops algum erro ocorreu", "Erro");
+        }
+
+        await ModalService.Hide();
     }
 }

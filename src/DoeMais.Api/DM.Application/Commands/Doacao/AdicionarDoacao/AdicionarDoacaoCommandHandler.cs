@@ -1,4 +1,5 @@
 ﻿using DM.Application.Events.EstoqueSangue;
+using DM.Core.Messages;
 using DM.Core.Messages.Handlers;
 using DM.Core.WebApi;
 using DM.Domain.Repositories;
@@ -11,13 +12,15 @@ namespace DM.Application.Commands.Doacao.AdicionarDoacao
         private readonly IRepositoryCommandAll<Domain.Entities.Doador> _repositoryCommandAllDoador;
         
         private readonly IRepositoryCommandAll<Domain.Entities.Doacao> _repositoryCommandAllDoacao;
-
+        private readonly IRepositoryCommandAll<Domain.Entities.EstoqueSangue> _repositoryCommandAllEstoqueSangue;
 
         public AdicionarDoacaoCommandHandler(IRepositoryCommandAll<Domain.Entities.Doacao> repositoryCommandAllDoacao,
-            IRepositoryCommandAll<Domain.Entities.Doador> repositoryCommandAllDoador)
+            IRepositoryCommandAll<Domain.Entities.Doador> repositoryCommandAllDoador,
+            IRepositoryCommandAll<Domain.Entities.EstoqueSangue> repositoryCommandAllEstoqueSangue)
         {
             _repositoryCommandAllDoacao = repositoryCommandAllDoacao;
             _repositoryCommandAllDoador = repositoryCommandAllDoador;
+            _repositoryCommandAllEstoqueSangue = repositoryCommandAllEstoqueSangue;
         }
 
         public override async Task<RequestResult<Unit>> Handle(AdicionarDoacaoCommand message, CancellationToken cancellationToken)
@@ -44,9 +47,16 @@ namespace DM.Application.Commands.Doacao.AdicionarDoacao
                 message.QuantidadeML, 
                 message.DoadorId);
 
-            doacao.AdicionarEvento(new EstoqueSangueAtualizadoEvent(doadorExistente.FatorRh, 
-                doadorExistente.TipoSanguineo, 
-                doacao.QuantidadeML));
+            
+             var estoqueSangue = await _repositoryCommandAllEstoqueSangue.FirstOrDefault(leitura: true,
+                filtro: es => es.TipoSanguineo == doadorExistente.TipoSanguineo && es.FatorRh == doadorExistente.FatorRh);
+                estoqueSangue.AdicionarQuantidadeMl(doacao.QuantidadeML);
+
+                _repositoryCommandAllEstoqueSangue.Update(estoqueSangue);
+
+                await _repositoryCommandAllEstoqueSangue.UnitOfWork.Commit();
+
+            doacao.AdicionarEvento(new EstoqueSangueAtualizadoEvent(doadorExistente.FatorRh, doadorExistente.TipoSanguineo, doacao.QuantidadeML, doadorExistente.NomeCompleto));
 
             await _repositoryCommandAllDoacao.CreateAsync(doacao);
             

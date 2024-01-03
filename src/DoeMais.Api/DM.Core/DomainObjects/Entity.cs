@@ -31,14 +31,16 @@ namespace DM.Core.DomainObjects
             DataAtualizado= dataAtualizado;
         }
 
-        private List<Event> _eventos;
+        private readonly List<Event> _eventos = new();
         
         public IReadOnlyCollection<Event> Eventos =>
-            _eventos?.AsReadOnly();
+            _eventos;
+
+        public IReadOnlyCollection<Event> GetEventos() =>
+           _eventos.ToList();
 
         public void AdicionarEvento(Event @event)
         {
-            _eventos = _eventos ??  new List<Event>();
             _eventos.Add(@event);
         }
 

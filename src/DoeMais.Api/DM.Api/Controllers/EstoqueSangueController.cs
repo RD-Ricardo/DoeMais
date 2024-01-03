@@ -1,5 +1,4 @@
-﻿using DM.Application.Queries.Doacao.ListarTodasDoacoes;
-using DM.Application.Queries.EstoqueSangue.ListarEstoqueSangue;
+﻿using DM.Application.Queries.EstoqueSangue.ListarEstoqueSangue;
 using DM.Core.Communication.Mediator;
 using DM.Core.WebApi;
 using DM.Shared.ViewModels;

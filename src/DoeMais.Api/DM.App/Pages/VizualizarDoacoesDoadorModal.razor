@@ -1,0 +1,54 @@
+﻿@using DM.Shared.ViewModels;
+@using System.Text.Json;
+@inject IModalService ModalService;
+@inject INotificationService NotificationService;
+@inject HttpClient Http;
+
+<ModalHeader>
+    <ModalTitle>Atualizar doador</ModalTitle>
+</ModalHeader>
+ <ModalBody>
+     @if(doacoes is not null)
+     {
+        if (doacoes.Any())
+        {
+            <DataGrid TItem="DoacaoViewModel"
+              Data="@doacoes"
+              @bind-SelectedRow="@doacaoViewModel"
+              Editable
+              Responsive>
+                <DataGridColumn Field="@nameof(DoacaoViewModel.DataDoacao)" Caption="Data doação" Editable />
+                <DataGridColumn Field="@nameof(DoacaoViewModel.QuantidadeML)" Caption="Quantiade ML" Editable />
+            </DataGrid>
+        }
+        else
+        {
+            <h1>Nenhuma doação encontrada.</h1>
+        }
+    }
+ </ModalBody>
+
+@code {
+    [Parameter]
+    public string DoadorId { get; set; }
+
+    List<DoacaoViewModel> doacoes = null;
+    private DoacaoViewModel doacaoViewModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BuscarDoacoesPorDoador();
+    }
+
+    private async Task BuscarDoacoesPorDoador()
+    {
+        var request = await Http.GetAsync($"api/Doacao/{DoadorId}/porDoador");
+
+        var response = await request.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<RequestResult<List<DoacaoViewModel>>>(response,
+            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+        doacoes = result.Dados;
+    }
+}

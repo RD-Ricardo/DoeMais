@@ -93,7 +93,7 @@
                          <FieldLabel 
                     RequiredIndicator
                          >Data nascimento</FieldLabel>
-                     <DateEdit TValue="DateTime" @bind-Date="@model.DataNascimento" />
+                        <DateEdit TValue="DateTime" @bind-Date="@dataNascimento" />
                      </Field>
 
 
@@ -172,6 +172,8 @@ else
         tipoSanguineo = (int)model.TipoSanguineo;
         fatorRh = (int)model.FatorRh;
         genero = (int)model.Genero;
+        dataNascimento = model.DataNascimento;
+
         enderecoDTO = new EnderecoDTO
         {
             Cep = model.Endereco.Cep,
@@ -194,7 +196,7 @@ else
             Genero = genero,
             NomeCompleto = model.NomeCompleto,
             Peso = model.Peso,
-            TipoSanguineo = tipoSanguineo
+            TipoSanguineo = tipoSanguineo,
         };
 
         var request = await Http.PutAsJsonAsync($"api/Doador/{DoadorId}", doador);

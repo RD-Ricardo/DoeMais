@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.8.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
@@ -15,6 +16,10 @@
     <ProjectReference Include="..\DM.Application\DM.Application.csproj" />
     <ProjectReference Include="..\DM.Core\DM.Core.csproj" />
     <ProjectReference Include="..\DM.Infrastructure\DM.Infrastructure.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pdfs\" />
   </ItemGroup>
 
 </Project>
