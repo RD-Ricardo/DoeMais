@@ -3,6 +3,7 @@ using DM.Core.Data;
 using DM.Core.DomainObjects;
 using DM.Core.Messages;
 using DM.Domain.Entities;
+using DM.Infrastructure.Data.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -21,6 +22,7 @@ namespace DM.Infrastructure.Data.CommandsDb
         public DbSet<Doacao> Doacoes { get; set; }
         public DbSet<Doador> Doadores { get; set; }
         public DbSet<EstoqueSangue> EstoqueSangues { get; set; }
+        public DbSet<OutBoxMessage> OutBoxMessages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Ignore<Entity>();
@@ -51,14 +53,8 @@ namespace DM.Infrastructure.Data.CommandsDb
                 entidade.Entity.AdicionarEvento(new EntityEvent(entidadeJson, entidadeType, (EntityStateEvent)entidade.State, 0));
             }
 
-            bool resultado = await SaveChangesAsync() > 0;
-
-            if (resultado)
-            {
-                await _mediatorHandler.PublicarEventosDominios(this);
-            }
-            
-            return resultado;
+            await _mediatorHandler.PublicarEventosDominios(this);
+            return await SaveChangesAsync() > 0;
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using DM.Infrastructure.Data.CommandsDb;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DM.Infrastructure.Data.CommandDb.Migrations
 {
     [DbContext(typeof(DoeMaisDbContextMySql))]
-    partial class DoeMaisDbContextMySqlModelSnapshot : ModelSnapshot
+    [Migration("20231231231029_Versao.001.00")]
+    partial class Versao00100
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
