@@ -18,9 +18,6 @@ builder.Services
     .AddBootstrapProviders()
     .AddFontAwesomeIcons();
 
-//builder.Services.AddHttpClient(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
-//builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("DM.Api"));
-//builder.Services.AddTransient<HttpClient>();
 
 builder.Services.AddScoped(sp =>
 new HttpClient
